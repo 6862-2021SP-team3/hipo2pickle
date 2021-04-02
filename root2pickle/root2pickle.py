@@ -368,9 +368,9 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description="Get args",formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
-    parser.add_argument("-f","--fname",help="a single root file to convert into pickles",default="/Users/sangbaek/Dropbox (MIT)/data/project/merged_9628_files.root")
-    parser.add_argument("-o","--out",help="a single pickle file name as an output",default="goodbyeRoot.pkl")
-    parser.add_argument("-s","--entry_stop",help="entry_stop to stop reading the root file",default='None')
+    parser.add_argument("-f","--fname", help="a single root file to convert into pickles", default="/Users/sangbaek/Dropbox (MIT)/data/project/merged_9628_files.root")
+    parser.add_argument("-o","--out", help="a single pickle file name as an output", default="goodbyeRoot.pkl")
+    parser.add_argument("-s","--entry_stop", help="entry_stop to stop reading the root file", default = None)
     
     args = parser.parse_args()
 
