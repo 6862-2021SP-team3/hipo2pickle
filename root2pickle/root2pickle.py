@@ -97,6 +97,9 @@ class root2pickle():
         #save data into df_epg, df_epgg for parent class epg
         self.readFile()
 
+        if entry_stop is not None:
+            entry_stop = int(entry_stop)
+
         # data frames and their keys to read Z part
         df_electronGen = pd.DataFrame()
         df_protonGen = pd.DataFrame()
@@ -106,11 +109,11 @@ class root2pickle():
         gamKeysGen = ["GenGpx", "GenGpy", "GenGpz"]
         # read keys
         for key in eleKeysGen:
-            df_electronGen[key] = self.tree[key].array(library="pd", entry_stop=int(entry_stop))
+            df_electronGen[key] = self.tree[key].array(library="pd", entry_stop=entry_stop)
         for key in proKeysGen:
-            df_protonGen[key] = self.tree[key].array(library="pd", entry_stop=int(entry_stop))
+            df_protonGen[key] = self.tree[key].array(library="pd", entry_stop=entry_stop)
         for key in gamKeysGen:
-            df_gammaGen[key] = self.tree[key].array(library="pd", entry_stop=int(entry_stop))
+            df_gammaGen[key] = self.tree[key].array(library="pd", entry_stop=entry_stop)
 
         #convert data type to standard double
         df_electronGen = df_electronGen.astype({"GenEpx": float, "GenEpy": float, "GenEpz": float})
@@ -189,11 +192,11 @@ class root2pickle():
         gamKeysRec = ["Gpx", "Gpy", "Gpz", "Gsector"]
         # read them
         for key in eleKeysRec:
-            df_electronRec[key] = self.tree[key].array(library="pd", entry_stop=int(entry_stop))
+            df_electronRec[key] = self.tree[key].array(library="pd", entry_stop=entry_stop)
         for key in proKeysRec:
-            df_protonRec[key] = self.tree[key].array(library="pd", entry_stop=int(entry_stop))
+            df_protonRec[key] = self.tree[key].array(library="pd", entry_stop=entry_stop)
         for key in gamKeysRec:
-            df_gammaRec[key] = self.tree[key].array(library="pd", entry_stop=int(entry_stop))
+            df_gammaRec[key] = self.tree[key].array(library="pd", entry_stop=entry_stop)
 
         self.closeFile()
 
