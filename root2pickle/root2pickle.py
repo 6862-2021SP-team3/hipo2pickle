@@ -106,11 +106,11 @@ class root2pickle():
         gamKeysGen = ["GenGpx", "GenGpy", "GenGpz"]
         # read keys
         for key in eleKeysGen:
-            df_electronGen[key] = self.tree[key].array(library="pd", entry_stop=entry_stop)
+            df_electronGen[key] = self.tree[key].array(library="pd", entry_stop=int(entry_stop))
         for key in proKeysGen:
-            df_protonGen[key] = self.tree[key].array(library="pd", entry_stop=entry_stop)
+            df_protonGen[key] = self.tree[key].array(library="pd", entry_stop=int(entry_stop))
         for key in gamKeysGen:
-            df_gammaGen[key] = self.tree[key].array(library="pd", entry_stop=entry_stop)
+            df_gammaGen[key] = self.tree[key].array(library="pd", entry_stop=int(entry_stop))
 
         #convert data type to standard double
         df_electronGen = df_electronGen.astype({"GenEpx": float, "GenEpy": float, "GenEpz": float})
@@ -189,11 +189,11 @@ class root2pickle():
         gamKeysRec = ["Gpx", "Gpy", "Gpz", "Gsector"]
         # read them
         for key in eleKeysRec:
-            df_electronRec[key] = self.tree[key].array(library="pd", entry_stop=entry_stop)
+            df_electronRec[key] = self.tree[key].array(library="pd", entry_stop=int(entry_stop))
         for key in proKeysRec:
-            df_protonRec[key] = self.tree[key].array(library="pd", entry_stop=entry_stop)
+            df_protonRec[key] = self.tree[key].array(library="pd", entry_stop=int(entry_stop))
         for key in gamKeysRec:
-            df_gammaRec[key] = self.tree[key].array(library="pd", entry_stop=entry_stop)
+            df_gammaRec[key] = self.tree[key].array(library="pd", entry_stop=int(entry_stop))
 
         self.closeFile()
 
@@ -340,7 +340,7 @@ class root2pickle():
         # df_z.loc[:, "z13"] = 2 # proton
         # df_z.loc[:, "z23"] = 3 # photon
         # df_z.loc[:, "z33"] = 3 # photon
-        df_z = df_z.loc[:, ["event", "z00", "z01", "z02", "z03", "z10", "z11", "z12", "z13", "z20", "z21", "z22", "z23", "z30", "z31", "z32", "z33", "Esector", "Gsector", "Gsector2"]]
+        df_z = df_z.loc[:, ["event", "z00", "z01", "z02", "z03", "z10", "z11", "z12", "z13", "z20", "z21", "z22", "z23", "z30", "z31", "z32", "z33"]]
 
         df_x = df_x.rename(columns = {"Epx": "x00", "Epy": "x01", "Epz": "x02", "Ppx": "x10", "Ppy": "x11", "Ppz": "x12", "Gpx": "x20", "Gpy": "x21", "Gpz": "x22", "Gpx2": "x30", "Gpy2": "x31", "Gpz2": "x32"})
         # df_x.loc[:, "x03"] = 1 # electron
