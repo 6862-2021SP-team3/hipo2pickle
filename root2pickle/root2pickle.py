@@ -338,12 +338,12 @@ class root2pickle():
         df_z = self.df_z
         df_x = self.df_x
 
-        df_z = df_z.rename(columns = {"GenEpx": "z00", "GenEpy": "z01", "GenEpz": "z02", "GenEe": "z03", "GenPpx": "z10", "GenPpy": "z11", "GenPpz": "z12", "GenPe": "z13", "GenGpx": "z20", "GenGpy": "z21", "GenGpz": "z22", "GenGe": "z23", "GenGpx2": "z30", "GenGpy2": "z31", "GenGpz2": "z32", "GenGe2": "z33"})
+        df_z = df_z.rename(columns = {"GenEpx": "z0", "GenEpy": "z1", "GenEpz": "z2", "GenEe": "z3", "GenPpx": "z4", "GenPpy": "z5", "GenPpz": "z6", "GenPe": "z7", "GenGpx": "z8", "GenGpy": "z9", "GenGpz": "z10", "GenGe": "z11", "GenGpx2": "z12", "GenGpy2": "z13", "GenGpz2": "z14", "GenGe2": "z15"})
         # df_z.loc[:, "z03"] = 1 # electron
         # df_z.loc[:, "z13"] = 2 # proton
         df_z.loc[:, "z23"] = df_z.loc[:, "z20"] # photon
         df_z.loc[:, "z33"] = df_z.loc[:, "z30"] # photon2
-        df_z = df_z.loc[:, ["event", "z00", "z01", "z02", "z03", "z10", "z11", "z12", "z13", "z20", "z21", "z22", "z23", "z30", "z31", "z32", "z33"]]
+        df_z = df_z.loc[:, ["event", "z0", "z1", "z2", "z3", "z4", "z5", "z6", "z7", "z8", "z9", "z10", "z11", "z12", "z13", "z14", "z15"]]
 
         df_x = df_x.rename(columns = {"Epx": "0", "Epy": "1", "Epz": "2", "Ee": "3","Ppx": "4", "Ppy": "5", "Ppz": "6", "Pe": "7", "Gpx": "8", "Gpy": "9", "Gpz": "10", "Ge": "11", "Gpx2": "12", "Gpy2": "13", "Gpz2": "14", "Ge2": "15"})
         # df_x.loc[:, "3"] = 1 # electron
