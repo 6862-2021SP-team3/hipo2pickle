@@ -345,12 +345,12 @@ class root2pickle():
         df_z.loc[:, "z33"] = df_z.loc[:, "z30"] # photon2
         df_z = df_z.loc[:, ["event", "z00", "z01", "z02", "z03", "z10", "z11", "z12", "z13", "z20", "z21", "z22", "z23", "z30", "z31", "z32", "z33"]]
 
-        df_x = df_x.rename(columns = {"Epx": "x00", "Epy": "x01", "Epz": "x02", "Ee": "x03","Ppx": "x10", "Ppy": "x11", "Ppz": "x12", "Pe": "x13", "Gpx": "x20", "Gpy": "x21", "Gpz": "x22", "Ge": "x23", "Gpx2": "x30", "Gpy2": "x31", "Gpz2": "x32", "Ge2": "x33"})
-        # df_x.loc[:, "x03"] = 1 # electron
+        df_x = df_x.rename(columns = {"Epx": "0", "Epy": "1", "Epz": "2", "Ee": "3","Ppx": "4", "Ppy": "5", "Ppz": "6", "Pe": "7", "Gpx": "8", "Gpy": "9", "Gpz": "10", "Ge": "11", "Gpx2": "12", "Gpy2": "13", "Gpz2": "14", "Ge2": "15"})
+        # df_x.loc[:, "3"] = 1 # electron
         # df_x.loc[:, "x13"] = 2 # proton
         # df_x.loc[:, "x23"] = 3 # photon
         # df_x.loc[:, "x33"] = 3 # photon2
-        df_x = df_x.loc[:, ["event", "x00", "x01", "x02", "x03", "x10", "x11", "x12", "x13", "x20", "x21", "x22", "x23", "x30", "x31", "x32", "x33", "Esector", "Gsector", "Gsector2"]]
+        df_x = df_x.loc[:, ["event", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "Esector", "Gsector", "Gsector2"]]
 
         df = pd.merge(df_x, df_z, how = 'inner', on='event')
         self.df = df
