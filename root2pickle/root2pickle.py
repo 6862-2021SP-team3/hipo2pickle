@@ -342,7 +342,7 @@ class root2pickle():
         df_z.loc[:, "z33"] = df_z.loc[:, "z30"] # photon2
         df_z = df_z.loc[:, ["event", "z00", "z01", "z02", "z03", "z10", "z11", "z12", "z13", "z20", "z21", "z22", "z23", "z30", "z31", "z32", "z33"]]
 
-        df_x = df_x.rename(columns = {"Epx": "x00", "Epy": "x01", "Epz": "x02", "Ee": "x02","Ppx": "x10", "Ppy": "x11", "Ppz": "x12", "Pe": "x13", "Gpx": "x20", "Gpy": "x21", "Gpz": "x22", "Ge": "x23", "Gpx2": "x30", "Gpy2": "x31", "Gpz2": "x32", "Ge2": "x33"})
+        df_x = df_x.rename(columns = {"Epx": "x00", "Epy": "x01", "Epz": "x02", "Ee": "x03","Ppx": "x10", "Ppy": "x11", "Ppz": "x12", "Pe": "x13", "Gpx": "x20", "Gpy": "x21", "Gpz": "x22", "Ge": "x23", "Gpx2": "x30", "Gpy2": "x31", "Gpz2": "x32", "Ge2": "x33"})
         # df_x.loc[:, "x03"] = 1 # electron
         # df_x.loc[:, "x13"] = 2 # proton
         # df_x.loc[:, "x23"] = 3 # photon
