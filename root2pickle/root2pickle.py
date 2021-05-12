@@ -338,40 +338,19 @@ class root2pickle():
         df_z = self.df_z
         df_x = self.df_x
 
-        df_z = df_z.rename(columns = {"GenEpx": "z0", "GenEpy": "z1", "GenEpz": "z2", "GenEe": "z3", "GenPpx": "z4", "GenPpy": "z5", "GenPpz": "z6", "GenPe": "z7", "GenGpx": "z8", "GenGpy": "z9", "GenGpz": "z10", "GenGe": "z11", "GenGpx2": "z12", "GenGpy2": "z13", "GenGpz2": "z14", "GenGe2": "z15"})
+        df_z = df_z.rename(columns = {"GenEpx": "z1", "GenEpy": "z2", "GenEpz": "z3", "GenEe": "z0", "GenPpx": "z5", "GenPpy": "z6", "GenPpz": "z7", "GenPe": "z4", "GenGpx": "z9", "GenGpy": "z10", "GenGpz": "z11", "GenGpx2": "z13", "GenGpy2": "z14", "GenGpz2": "z15"})
         # df_z.loc[:, "z03"] = 1 # electron
         # df_z.loc[:, "z13"] = 2 # proton
-        df_z.loc[:, "z23"] = df_z.loc[:, "z20"] # photon
-        df_z.loc[:, "z33"] = df_z.loc[:, "z30"] # photon2
+        df_z.loc[:, "z8"] = df_z.loc[:, "GenGp"] # photon
+        df_z.loc[:, "z12"] = df_z.loc[:, "GenGp2"] # photon2
         df_z = df_z.loc[:, ["event", "z0", "z1", "z2", "z3", "z4", "z5", "z6", "z7", "z8", "z9", "z10", "z11", "z12", "z13", "z14", "z15"]]
 
-        df_x = df_x.rename(columns = {"Epx": "0", "Epy": "1", "Epz": "2", "Ee": "3","Ppx": "4", "Ppy": "5", "Ppz": "6", "Pe": "7", "Gpx": "8", "Gpy": "9", "Gpz": "10", "Ge": "11", "Gpx2": "12", "Gpy2": "13", "Gpz2": "14", "Ge2": "15"})
+        df_x = df_x.rename(columns = {"Epx": "1", "Epy": "2", "Epz": "3", "Ee": "0","Ppx": "5", "Ppy": "6", "Ppz": "7", "Pe": "4", "Gpx": "9", "Gpy": "10", "Gpz": "11", "Ge": "8", "Gpx2": "13", "Gpy2": "14", "Gpz2": "15", "Ge2": "12"})
         # df_x.loc[:, "3"] = 1 # electron
         # df_x.loc[:, "x13"] = 2 # proton
         # df_x.loc[:, "x23"] = 3 # photon
         # df_x.loc[:, "x33"] = 3 # photon2
         df_x = df_x.loc[:, ["event", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "Esector", "Gsector", "Gsector2"]]
-
-        df = pd.merge(df_x, df_z, how = 'inner', on='event')
-        self.df = df
-
-    def saveDfSpherical(self):
-        df_z = self.df_z
-        df_x = self.df_x
-
-        df_z = df_z.rename(columns = {"GenEp": "z00", "GenEtheta": "z01", "GenEphi": "z02", "GenEe": "z03", "GenPp": "z10", "GenPtheta": "z11", "GenPphi": "z12", "GenPe": "z13", "GenGp": "z20", "GenGtheta": "z21", "GenGphi": "z22", "GenGe": "z23", "GenGp2": "z30", "GenGtheta2": "z31", "GenGphi2": "z32", "GenGe2": "z33"})
-        # df_z.loc[:, "z03"] = 1 # electron
-        # df_z.loc[:, "z13"] = 2 # proton
-        df_z.loc[:, "z23"] = df_z.loc[:, "z20"] # photon
-        df_z.loc[:, "z33"] = df_z.loc[:, "z30"] # photon2
-        df_z = df_z.loc[:, ["event", "z00", "z01", "z02", "z03", "z10", "z11", "z12", "z13", "z20", "z21", "z22", "z23", "z30", "z31", "z32", "z33"]]
-
-        df_x = df_x.rename(columns = {"Ep": "x00", "Etheta": "x01", "Ephi": "x02", "Pp": "x10", "Ptheta": "x11", "Pphi": "x12", "Gp": "x20", "Gtheta": "x21", "Gphi": "x22", "Gp2": "x30", "Gtheta2": "x31", "Gphi2": "x32"})
-        # df_x.loc[:, "x03"] = 1 # electron
-        # df_x.loc[:, "x13"] = 2 # proton
-        # df_x.loc[:, "x23"] = 3 # photon
-        # df_x.loc[:, "x33"] = 3 # photon2
-        df_x = df_x.loc[:, ["event", "x00", "x01", "x02", "x03", "x10", "x11", "x12", "x13", "x20", "x21", "x22", "x23", "x30", "x31", "x32", "x33"]]
 
         df = pd.merge(df_x, df_z, how = 'inner', on='event')
         self.df = df
