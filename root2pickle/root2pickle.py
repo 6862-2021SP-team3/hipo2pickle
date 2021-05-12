@@ -292,32 +292,39 @@ class root2pickle():
         #make dvpi0 pairs
         df_epgg = self.df_epgg
 
-        df_epgg.loc[:, "closeness"] = np.abs(df_epgg.loc[:, "Mpi0"] - .1349766)
+        # df_epgg.loc[:, "closeness"] = np.abs(df_epgg.loc[:, "Mpi0"] - .1349766)
 
-        cut_xBupper = df_epgg.loc[:, "xB"] < 1  # xB
-        cut_xBlower = df_epgg.loc[:, "xB"] > 0  # xB
-        cut_Q2 = df_epgg.loc[:, "Q2"] > 1  # Q2
-        cut_W = df_epgg.loc[:, "W"] > 2  # W
+        # cut_xBupper = df_epgg.loc[:, "xB"] < 1  # xB
+        # cut_xBlower = df_epgg.loc[:, "xB"] > 0  # xB
+        # cut_Q2 = df_epgg.loc[:, "Q2"] > 1  # Q2
+        # cut_W = df_epgg.loc[:, "W"] > 2  # W
 
-        # Exclusivity cuts
-        cut_mmep = df_epgg.loc[:, "MM2_ep"] < 0.7  # mmep
-        cut_meepgg = df_epgg.loc[:, "ME_epgg"] < 0.7  # meepgg
-        cut_mpt = df_epgg.loc[:, "MPt"] < 0.2  # mpt
-        cut_recon = df_epgg.loc[:, "reconPi"] < 2  # recon gam angle
-        cut_pi0upper = df_epgg.loc[:, "Mpi0"] < 0.2
-        cut_pi0lower = df_epgg.loc[:, "Mpi0"] > 0.07
-        cut_sector = (df_epgg.loc[:, "Esector"]!=df_epgg.loc[:, "Gsector"]) & (df_epgg.loc[:, "Esector"]!=df_epgg.loc[:, "Gsector2"])
+        # # Exclusivity cuts
+        # cut_mmep = df_epgg.loc[:, "MM2_ep"] < 0.7  # mmep
+        # cut_meepgg = df_epgg.loc[:, "ME_epgg"] < 0.7  # meepgg
+        # cut_mpt = df_epgg.loc[:, "MPt"] < 0.2  # mpt
+        # cut_recon = df_epgg.loc[:, "reconPi"] < 2  # recon gam angle
+        # cut_pi0upper = df_epgg.loc[:, "Mpi0"] < 0.2
+        # cut_pi0lower = df_epgg.loc[:, "Mpi0"] > 0.07
+        # cut_sector = (df_epgg.loc[:, "Esector"]!=df_epgg.loc[:, "Gsector"]) & (df_epgg.loc[:, "Esector"]!=df_epgg.loc[:, "Gsector2"])
 
-        df_dvpi0 = df_epgg.loc[cut_xBupper & cut_xBlower & cut_Q2 & cut_W & cut_mmep & cut_meepgg &
-                           cut_mpt & cut_recon & cut_pi0upper & cut_pi0lower & cut_sector, :]
+        # df_dvpi0 = df_epgg.loc[cut_xBupper & cut_xBlower & cut_Q2 & cut_W & cut_mmep & cut_meepgg &
+        #                    cut_mpt & cut_recon & cut_pi0upper & cut_pi0lower & cut_sector, :]
 
-        #For an event, there can be two gg's passed conditions above.
-        #Take only one gg's that makes pi0 invariant mass
-        #This case is very rare.
-        #For now, duplicated proton is not considered.
-        df_dvpi0.sort_values(by='closeness', ascending=False)
-        df_dvpi0.sort_values(by='event')        
+        # #For an event, there can be two gg's passed conditions above.
+        # #Take only one gg's that makes pi0 invariant mass
+        # #This case is very rare.
+        # #For now, duplicated proton is not considered.
+        # df_dvpi0.sort_values(by='closeness', ascending=False)
+        # df_dvpi0.sort_values(by='event')        
+        # df_dvpi0 = df_dvpi0.loc[~df_dvpi0.event.duplicated(), :]
+
+        # I assume they are all sorted already, but sorting twice won't hurt.
+        df_dvpi0 = df_epgg
+        df_dvpi0['Epi0'] = df_dvpi0['Gp'] + df_dvpi0['Gp2']
+        df_dvpi0 = df_dvpi0.sort_values(by='Epi0', ascending = False)
         df_dvpi0 = df_dvpi0.loc[~df_dvpi0.event.duplicated(), :]
+        df_dvpi0 = df_dvpi0.sort_values(by='event')        
 
         df_x = df_dvpi0.loc[:, ["event", "Epx", "Epy", "Epz", "Ep", "Ephi", "Etheta", "Ppx", "Ppy", "Ppz", "Pp", "Pphi", "Ptheta", "Gpx", "Gpy", "Gpz", "Gp", "Gtheta", "Gphi", "Gpx2", "Gpy2", "Gpz2", "Gp2", "Gtheta2", "Gphi2"]]
         self.df_x = df_x #done with saving x
@@ -374,7 +381,7 @@ if __name__ == "__main__":
     
     args = parser.parse_args()
 
-    converter = root2pickle(args.fname, entry_stop = args.entry_stop, mode = 'spherical')
+    converter = root2pickle(args.fname, entry_stop = args.entry_stop, mode = 'cartesian')
     df = converter.df
 
     df.to_pickle(args.out)
