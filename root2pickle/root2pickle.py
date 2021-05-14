@@ -292,9 +292,9 @@ class root2pickle():
         #make dvpi0 pairs
         df_epgg = self.df_epgg
 
-        # df_epgg.loc[:, "closeness"] = np.abs(df_epgg.loc[:, "Mpi0"] - .1349766)
-
         if mode == "pi0":
+            df_epgg.loc[:, "closeness"] = np.abs(df_epgg.loc[:, "Mpi0"] - .1349766)
+
             cut_xBupper = df_epgg.loc[:, "xB"] < 1  # xB
             cut_xBlower = df_epgg.loc[:, "xB"] > 0  # xB
             cut_Q2 = df_epgg.loc[:, "Q2"] > 1  # Q2
