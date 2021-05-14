@@ -71,17 +71,12 @@ def getEnergy(vec1, mass):
 
 class root2pickle():
     #class to read root to make epg pairs, inherited from epg
-    def __init__(self, fname, entry_stop = None, mode = 'spherical'):
+    def __init__(self, fname, entry_stop = None, mode = 'epgg'):
         self.fname = fname
         self.readEPGG(entry_stop)
         self.saveDVpi0vars()
-        self.makeDVpi0()
-        if mode == 'spherical':
-            self.saveDfSpherical()
-        elif mode == 'cartesian':
-            self.saveDfCartesian()
-        else:
-            print('mode must be either spherical or cartesian')
+        self.makeDVpi0(mode = mode)
+        self.saveDfCartesian()
 
     def readFile(self):
         #read root using uproot
@@ -293,43 +288,48 @@ class root2pickle():
         df_epgg.loc[:,"Pie"] = df_epgg['Ge'] + df_epgg['Ge2']
         self.df_epgg = df_epgg
 
-    def makeDVpi0(self):
+    def makeDVpi0(self, mode = 'epgg'):
         #make dvpi0 pairs
         df_epgg = self.df_epgg
 
         # df_epgg.loc[:, "closeness"] = np.abs(df_epgg.loc[:, "Mpi0"] - .1349766)
 
-        # cut_xBupper = df_epgg.loc[:, "xB"] < 1  # xB
-        # cut_xBlower = df_epgg.loc[:, "xB"] > 0  # xB
-        # cut_Q2 = df_epgg.loc[:, "Q2"] > 1  # Q2
-        # cut_W = df_epgg.loc[:, "W"] > 2  # W
+        if mode == "pi0":
+            cut_xBupper = df_epgg.loc[:, "xB"] < 1  # xB
+            cut_xBlower = df_epgg.loc[:, "xB"] > 0  # xB
+            cut_Q2 = df_epgg.loc[:, "Q2"] > 1  # Q2
+            cut_W = df_epgg.loc[:, "W"] > 2  # W
 
-        # # Exclusivity cuts
-        # cut_mmep = df_epgg.loc[:, "MM2_ep"] < 0.7  # mmep
-        # cut_meepgg = df_epgg.loc[:, "ME_epgg"] < 0.7  # meepgg
-        # cut_mpt = df_epgg.loc[:, "MPt"] < 0.2  # mpt
-        # cut_recon = df_epgg.loc[:, "reconPi"] < 2  # recon gam angle
-        # cut_pi0upper = df_epgg.loc[:, "Mpi0"] < 0.2
-        # cut_pi0lower = df_epgg.loc[:, "Mpi0"] > 0.07
-        # cut_sector = (df_epgg.loc[:, "Esector"]!=df_epgg.loc[:, "Gsector"]) & (df_epgg.loc[:, "Esector"]!=df_epgg.loc[:, "Gsector2"])
+            # Exclusivity cuts
+            cut_mmep = df_epgg.loc[:, "MM2_ep"] < 0.7  # mmep
+            cut_meepgg = df_epgg.loc[:, "ME_epgg"] < 0.7  # meepgg
+            cut_mpt = df_epgg.loc[:, "MPt"] < 0.2  # mpt
+            cut_recon = df_epgg.loc[:, "reconPi"] < 2  # recon gam angle
+            cut_pi0upper = df_epgg.loc[:, "Mpi0"] < 0.2
+            cut_pi0lower = df_epgg.loc[:, "Mpi0"] > 0.07
+            cut_sector = (df_epgg.loc[:, "Esector"]!=df_epgg.loc[:, "Gsector"]) & (df_epgg.loc[:, "Esector"]!=df_epgg.loc[:, "Gsector2"])
 
-        # df_dvpi0 = df_epgg.loc[cut_xBupper & cut_xBlower & cut_Q2 & cut_W & cut_mmep & cut_meepgg &
-        #                    cut_mpt & cut_recon & cut_pi0upper & cut_pi0lower & cut_sector, :]
+            df_dvpi0 = df_epgg.loc[cut_xBupper & cut_xBlower & cut_Q2 & cut_W & cut_mmep & cut_meepgg &
+                               cut_mpt & cut_recon & cut_pi0upper & cut_pi0lower & cut_sector, :]
 
-        # #For an event, there can be two gg's passed conditions above.
-        # #Take only one gg's that makes pi0 invariant mass
-        # #This case is very rare.
-        # #For now, duplicated proton is not considered.
-        # df_dvpi0.sort_values(by='closeness', ascending=False)
-        # df_dvpi0.sort_values(by='event')        
-        # df_dvpi0 = df_dvpi0.loc[~df_dvpi0.event.duplicated(), :]
+            #For an event, there can be two gg's passed conditions above.
+            #Take only one gg's that makes pi0 invariant mass
+            #This case is very rare.
+            #For now, duplicated proton is not considered.
+            df_dvpi0 = df_dvpi0.sort_values(by='closeness', ascending=True)
+            df_dvpi0 = df_dvpi0.loc[~df_dvpi0.event.duplicated(), :]
+            df_dvpi0 = df_dvpi0.sort_values(by='event') 
 
-        # I assume they are all sorted already, but sorting twice won't hurt.
-        df_dvpi0 = df_epgg
-        df_dvpi0['Epi0'] = df_dvpi0['Gp'] + df_dvpi0['Gp2']
-        df_dvpi0 = df_dvpi0.sort_values(by='Epi0', ascending = False)
-        df_dvpi0 = df_dvpi0.loc[~df_dvpi0.event.duplicated(), :]
-        df_dvpi0 = df_dvpi0.sort_values(by='event')        
+        elif mode == "epgg":     
+            # I assume they are all sorted already, but sorting twice won't hurt.
+            df_dvpi0 = df_epgg
+            df_dvpi0['Epi0'] = df_dvpi0['Gp'] + df_dvpi0['Gp2']
+            df_dvpi0 = df_dvpi0.sort_values(by='Epi0', ascending = False)
+            df_dvpi0 = df_dvpi0.loc[~df_dvpi0.event.duplicated(), :]
+            df_dvpi0 = df_dvpi0.sort_values(by='event')
+        else:
+            print("mode must be pi0 or epgg")
+            exit()     
 
         df_x = df_dvpi0.loc[:, ["event", "Epx", "Epy", "Epz", "Ep", "Etheta", "Ephi", "Ee", "Ppx", "Ppy", "Ppz", "Pp", "Ptheta", "Pphi", "Pe", "Gpx", "Gpy", "Gpz", "Gp", "Gtheta", "Gphi", "Ge", "Gpx2", "Gpy2", "Gpz2", "Gp2", "Gtheta2", "Gphi2", "Ge2", "Esector", "Gsector", "Gsector2"]]
         self.df_x = df_x #done with saving x
@@ -362,10 +362,11 @@ if __name__ == "__main__":
     parser.add_argument("-f","--fname", help="a single root file to convert into pickles", default="/Users/sangbaek/Dropbox (MIT)/data/project/merged_9628_files.root")
     parser.add_argument("-o","--out", help="a single pickle file name as an output", default="goodbyeRoot.pkl")
     parser.add_argument("-s","--entry_stop", help="entry_stop to stop reading the root file", default = None)
+    parser.add_argument("-m","--mode", help="pi0 cuts or all epgg", default = "epgg")
     
     args = parser.parse_args()
 
-    converter = root2pickle(args.fname, entry_stop = args.entry_stop, mode = 'cartesian')
+    converter = root2pickle(args.fname, entry_stop = args.entry_stop, mode = args.mode)
     df = converter.df
 
     df.to_pickle(args.out)
