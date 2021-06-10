@@ -362,10 +362,10 @@ class root2pickle():
         df_epg.loc[:, 'Ephi'] = getPhi(ele)
 
         pro = [df_epg['Ppx'], df_epg['Ppy'], df_epg['Ppz']]
-        df_epg.loc[:, 'Pp'] = mag(pro)
-        df_epg.loc[:, 'Pe'] = getEnergy(pro, M)
-        df_epg.loc[:, 'Ptheta'] = getTheta(pro)
-        df_epg.loc[:, 'Pphi'] = getPhi(pro)
+        df_epgp.loc[:, 'Pp'] = mag(pro)
+        df_epgp.loc[:, 'Pe'] = getEnergy(pro, M)
+        df_epgp.loc[:, 'Ptheta'] = getTheta(pro)
+        df_epgp.loc[:, 'Pphi'] = getPhi(pro)
 
         gam = [df_epg['Gpx'], df_epg['Gpy'], df_epg['Gpz']]
         df_epg.loc[:, 'Gp'] = mag(gam)
@@ -463,8 +463,8 @@ class root2pickle():
         #exclude dvpi0 from dvcs. use only when both set up.
         df_dvcs = self.df_dvcs
         pi0to2gammas = df_dvcs["event"].isin(self.df_dvpi0["event"])
-        df_dvcs = df_dvcs[~pi0to2gammas]
-        self.df_dvcs = df_dvcs
+        df_x = df_dvcs[~pi0to2gammas]
+        self.df_x = df_x
 
     def saveDfCartesian(self):
         df_z = self.df_z
