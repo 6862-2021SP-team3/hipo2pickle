@@ -78,6 +78,7 @@ class root2pickle():
         self.makeDVpi0()
         self.saveDVCSvars()
         self.makeDVCS()
+        self.pi02gSubtraction()
         self.saveDfCartesian()
 
     def readFile(self):
