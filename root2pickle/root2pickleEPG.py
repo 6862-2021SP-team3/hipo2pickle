@@ -71,15 +71,15 @@ def getEnergy(vec1, mass):
 
 class root2pickle():
     #class to read root to make epg pairs, inherited from epg
-    def __init__(self, fname, entry_stop = None, gen = "dvcs"):
+    def __init__(self, fname, entry_stop = None, gen = "dvcs", exp = False):
         self.fname = fname
-        self.readEPGG(entry_stop, gen = gen)
+        self.readEPGG(entry_stop, gen = gen, exp = exp)
         self.saveDVpi0vars()
         self.makeDVpi0()
         self.saveDVCSvars()
         self.makeDVCS()
         self.pi02gSubtraction()
-        self.saveDfCartesian()
+        self.saveDfCartesian(exp = exp)
 
     def readFile(self):
         #read root using uproot
@@ -91,103 +91,106 @@ class root2pickle():
         self.file = None
         self.tree = None
 
-    def readEPGG(self, entry_stop = None, gen = 'dvcs'):
+    def readEPGG(self, entry_stop = None, gen = 'dvcs', exp = False):
         #save data into df_epg, df_epgg for parent class epg
         self.readFile()
 
         if entry_stop is not None:
             entry_stop = int(entry_stop)
 
-        # data frames and their keys to read Z part
-        df_electronGen = pd.DataFrame()
-        df_protonGen = pd.DataFrame()
-        df_gammaGen = pd.DataFrame()
-        eleKeysGen = ["GenEpx", "GenEpy", "GenEpz"]
-        proKeysGen = ["GenPpx", "GenPpy", "GenPpz"]
-        gamKeysGen = ["GenGpx", "GenGpy", "GenGpz"]
-        # read keys
-        for key in eleKeysGen:
-            df_electronGen[key] = self.tree[key].array(library="pd", entry_stop=entry_stop)
-        for key in proKeysGen:
-            df_protonGen[key] = self.tree[key].array(library="pd", entry_stop=entry_stop)
-        for key in gamKeysGen:
-            df_gammaGen[key] = self.tree[key].array(library="pd", entry_stop=entry_stop)
+        if exp:
+            print("Reading experimental data.")
+        else:
+            # data frames and their keys to read Z part
+            df_electronGen = pd.DataFrame()
+            df_protonGen = pd.DataFrame()
+            df_gammaGen = pd.DataFrame()
+            eleKeysGen = ["GenEpx", "GenEpy", "GenEpz"]
+            proKeysGen = ["GenPpx", "GenPpy", "GenPpz"]
+            gamKeysGen = ["GenGpx", "GenGpy", "GenGpz"]
+            # read keys
+            for key in eleKeysGen:
+                df_electronGen[key] = self.tree[key].array(library="pd", entry_stop=entry_stop)
+            for key in proKeysGen:
+                df_protonGen[key] = self.tree[key].array(library="pd", entry_stop=entry_stop)
+            for key in gamKeysGen:
+                df_gammaGen[key] = self.tree[key].array(library="pd", entry_stop=entry_stop)
 
-        #convert data type to standard double
-        df_electronGen = df_electronGen.astype({"GenEpx": float, "GenEpy": float, "GenEpz": float})
-        df_protonGen = df_protonGen.astype({"GenPpx": float, "GenPpy": float, "GenPpz": float})
-        df_gammaGen = df_gammaGen.astype({"GenGpx": float, "GenGpy": float, "GenGpz": float})
+            #convert data type to standard double
+            df_electronGen = df_electronGen.astype({"GenEpx": float, "GenEpy": float, "GenEpz": float})
+            df_protonGen = df_protonGen.astype({"GenPpx": float, "GenPpy": float, "GenPpz": float})
+            df_gammaGen = df_gammaGen.astype({"GenGpx": float, "GenGpy": float, "GenGpz": float})
 
-        #set up a dummy index for merging
-        df_electronGen.loc[:,'event'] = df_electronGen.index
-        df_protonGen.loc[:,'event'] = df_protonGen.index
-        df_gammaGen.loc[:,'event'] = df_gammaGen.index.get_level_values('entry')
+            #set up a dummy index for merging
+            df_electronGen.loc[:,'event'] = df_electronGen.index
+            df_protonGen.loc[:,'event'] = df_protonGen.index
+            df_gammaGen.loc[:,'event'] = df_gammaGen.index.get_level_values('entry')
 
-        #sort columns for readability
-        df_electronGen = df_electronGen.loc[:, ["event", "GenEpx", "GenEpy", "GenEpz"]]
+            #sort columns for readability
+            df_electronGen = df_electronGen.loc[:, ["event", "GenEpx", "GenEpy", "GenEpz"]]
 
-        if gen == "dvcs":
-            df_gammaGen = df_gammaGen[df_gammaGen.index.get_level_values('subentry')==0]
-            # gamGen = [df_gammaGen["GenGpx"], df_gammaGen["GenGpy"], df_gammaGen["GenGpz"]]
-            # df_gammaGen.loc[:, 'GenGp'] = mag(gamGen)
+            if gen == "dvcs":
+                df_gammaGen = df_gammaGen[df_gammaGen.index.get_level_values('subentry')==0]
+                # gamGen = [df_gammaGen["GenGpx"], df_gammaGen["GenGpy"], df_gammaGen["GenGpz"]]
+                # df_gammaGen.loc[:, 'GenGp'] = mag(gamGen)
+                # df_gammaGen.loc[:, 'GenGtheta'] = getTheta(gamGen)
+                # df_gammaGen.loc[:, 'GenGphi'] = getPhi(gamGen)
+
+            elif gen=="pi0":
+                #two g's to one gg.
+                gamGen = [df_gammaGen["GenGpx"], df_gammaGen["GenGpy"], df_gammaGen["GenGpz"]]
+                df_gammaGen.loc[:, 'GenGp'] = mag(gamGen)
+
+                gam1 = df_gammaGen[df_gammaGen.index.get_level_values('subentry')==0]
+                gam1 = gam1.reset_index(drop=True)
+                gam2 = df_gammaGen[df_gammaGen.index.get_level_values('subentry')==1]
+                gam2 = gam2.reset_index(drop=True)
+
+                gam1.loc[:,"GenGp2"] = gam2.loc[:,"GenGp"]
+                gam1.loc[:,"GenGpx2"] = gam2.loc[:,"GenGpx"]
+                gam1.loc[:,"GenGpy2"] = gam2.loc[:,"GenGpy"]
+                gam1.loc[:,"GenGpz2"] = gam2.loc[:,"GenGpz"]
+                df_gammaGen = gam1
+
+                #sort GenG indices so that GenGp > GenGp2. This is because Gp > Gp2 at reconstruction level.
+                df_gammaGencopy = copy(df_gammaGen)
+                df_gammaGencopy.loc[:, "GenGp"] = np.where(df_gammaGen["GenGp"]>df_gammaGen["GenGp2"], df_gammaGen.loc[:, "GenGp"], df_gammaGen.loc[:, "GenGp2"])
+                df_gammaGencopy.loc[:, "GenGpx"] = np.where(df_gammaGen["GenGp"]>df_gammaGen["GenGp2"], df_gammaGen.loc[:, "GenGpx"], df_gammaGen.loc[:, "GenGpx2"])
+                df_gammaGencopy.loc[:, "GenGpy"] = np.where(df_gammaGen["GenGp"]>df_gammaGen["GenGp2"], df_gammaGen.loc[:, "GenGpy"], df_gammaGen.loc[:, "GenGpy2"])
+                df_gammaGencopy.loc[:, "GenGpz"] = np.where(df_gammaGen["GenGp"]>df_gammaGen["GenGp2"], df_gammaGen.loc[:, "GenGpz"], df_gammaGen.loc[:, "GenGpz2"])
+                df_gammaGencopy.loc[:, "GenGp2"] = np.where(df_gammaGen["GenGp"]>df_gammaGen["GenGp2"], df_gammaGen.loc[:, "GenGp2"], df_gammaGen.loc[:, "GenGp"])
+                df_gammaGencopy.loc[:, "GenGpx2"] = np.where(df_gammaGen["GenGp"]>df_gammaGen["GenGp2"], df_gammaGen.loc[:, "GenGpx2"], df_gammaGen.loc[:, "GenGpx"])
+                df_gammaGencopy.loc[:, "GenGpy2"] = np.where(df_gammaGen["GenGp"]>df_gammaGen["GenGp2"], df_gammaGen.loc[:, "GenGpy2"], df_gammaGen.loc[:, "GenGpy"])
+                df_gammaGencopy.loc[:, "GenGpz2"] = np.where(df_gammaGen["GenGp"]>df_gammaGen["GenGp2"], df_gammaGen.loc[:, "GenGpz2"], df_gammaGen.loc[:, "GenGpz"])
+                df_gammaGen = df_gammaGencopy
+
+
+            # #spherical coordinates
+            eleGen = [df_electronGen["GenEpx"], df_electronGen["GenEpy"], df_electronGen["GenEpz"]]
+            df_electronGen.loc[:, 'GenEe'] = getEnergy(eleGen, me)
+            # df_electronGen.loc[:, 'GenEp'] = mag(eleGen)
+            # df_electronGen.loc[:, 'GenEtheta'] = getTheta(eleGen)
+            # df_electronGen.loc[:, 'GenEphi'] = getPhi(eleGen)
+
+            proGen = [df_protonGen["GenPpx"], df_protonGen["GenPpy"], df_protonGen["GenPpz"]]
+            df_protonGen.loc[:, 'GenPe'] = getEnergy(proGen, M)
+            # df_protonGen.loc[:, 'GenPp'] = mag(proGen)
+            # df_protonGen.loc[:, 'GenPtheta'] = getTheta(proGen)
+            # df_protonGen.loc[:, 'GenPphi'] = getPhi(proGen)
+
+            gamGen = [df_gammaGen["GenGpx"], df_gammaGen["GenGpy"], df_gammaGen["GenGpz"]]
+            df_gammaGen.loc[:, 'GenGp'] = mag(gamGen)
             # df_gammaGen.loc[:, 'GenGtheta'] = getTheta(gamGen)
             # df_gammaGen.loc[:, 'GenGphi'] = getPhi(gamGen)
 
-        elif gen=="pi0":
-            #two g's to one gg.
-            gamGen = [df_gammaGen["GenGpx"], df_gammaGen["GenGpy"], df_gammaGen["GenGpz"]]
-            df_gammaGen.loc[:, 'GenGp'] = mag(gamGen)
+            # gamGen2 = [df_gammaGen["GenGpx2"], df_gammaGen["GenGpy2"], df_gammaGen["GenGpz2"]]
+            # debug = df_gammaGen.loc[:, 'GenGp2'] == mag(gamGen2)
+            # df_gammaGen.loc[:, 'GenGtheta2'] = getTheta(gamGen2)
+            # df_gammaGen.loc[:, 'GenGphi2'] = getPhi(gamGen2)
 
-            gam1 = df_gammaGen[df_gammaGen.index.get_level_values('subentry')==0]
-            gam1 = gam1.reset_index(drop=True)
-            gam2 = df_gammaGen[df_gammaGen.index.get_level_values('subentry')==1]
-            gam2 = gam2.reset_index(drop=True)
-
-            gam1.loc[:,"GenGp2"] = gam2.loc[:,"GenGp"]
-            gam1.loc[:,"GenGpx2"] = gam2.loc[:,"GenGpx"]
-            gam1.loc[:,"GenGpy2"] = gam2.loc[:,"GenGpy"]
-            gam1.loc[:,"GenGpz2"] = gam2.loc[:,"GenGpz"]
-            df_gammaGen = gam1
-
-            #sort GenG indices so that GenGp > GenGp2. This is because Gp > Gp2 at reconstruction level.
-            df_gammaGencopy = copy(df_gammaGen)
-            df_gammaGencopy.loc[:, "GenGp"] = np.where(df_gammaGen["GenGp"]>df_gammaGen["GenGp2"], df_gammaGen.loc[:, "GenGp"], df_gammaGen.loc[:, "GenGp2"])
-            df_gammaGencopy.loc[:, "GenGpx"] = np.where(df_gammaGen["GenGp"]>df_gammaGen["GenGp2"], df_gammaGen.loc[:, "GenGpx"], df_gammaGen.loc[:, "GenGpx2"])
-            df_gammaGencopy.loc[:, "GenGpy"] = np.where(df_gammaGen["GenGp"]>df_gammaGen["GenGp2"], df_gammaGen.loc[:, "GenGpy"], df_gammaGen.loc[:, "GenGpy2"])
-            df_gammaGencopy.loc[:, "GenGpz"] = np.where(df_gammaGen["GenGp"]>df_gammaGen["GenGp2"], df_gammaGen.loc[:, "GenGpz"], df_gammaGen.loc[:, "GenGpz2"])
-            df_gammaGencopy.loc[:, "GenGp2"] = np.where(df_gammaGen["GenGp"]>df_gammaGen["GenGp2"], df_gammaGen.loc[:, "GenGp2"], df_gammaGen.loc[:, "GenGp"])
-            df_gammaGencopy.loc[:, "GenGpx2"] = np.where(df_gammaGen["GenGp"]>df_gammaGen["GenGp2"], df_gammaGen.loc[:, "GenGpx2"], df_gammaGen.loc[:, "GenGpx"])
-            df_gammaGencopy.loc[:, "GenGpy2"] = np.where(df_gammaGen["GenGp"]>df_gammaGen["GenGp2"], df_gammaGen.loc[:, "GenGpy2"], df_gammaGen.loc[:, "GenGpy"])
-            df_gammaGencopy.loc[:, "GenGpz2"] = np.where(df_gammaGen["GenGp"]>df_gammaGen["GenGp2"], df_gammaGen.loc[:, "GenGpz2"], df_gammaGen.loc[:, "GenGpz"])
-            df_gammaGen = df_gammaGencopy
-
-
-        # #spherical coordinates
-        eleGen = [df_electronGen["GenEpx"], df_electronGen["GenEpy"], df_electronGen["GenEpz"]]
-        df_electronGen.loc[:, 'GenEe'] = getEnergy(eleGen, me)
-        # df_electronGen.loc[:, 'GenEp'] = mag(eleGen)
-        # df_electronGen.loc[:, 'GenEtheta'] = getTheta(eleGen)
-        # df_electronGen.loc[:, 'GenEphi'] = getPhi(eleGen)
-
-        proGen = [df_protonGen["GenPpx"], df_protonGen["GenPpy"], df_protonGen["GenPpz"]]
-        df_protonGen.loc[:, 'GenPe'] = getEnergy(proGen, M)
-        # df_protonGen.loc[:, 'GenPp'] = mag(proGen)
-        # df_protonGen.loc[:, 'GenPtheta'] = getTheta(proGen)
-        # df_protonGen.loc[:, 'GenPphi'] = getPhi(proGen)
-
-        gamGen = [df_gammaGen["GenGpx"], df_gammaGen["GenGpy"], df_gammaGen["GenGpz"]]
-        df_gammaGen.loc[:, 'GenGp'] = mag(gamGen)
-        # df_gammaGen.loc[:, 'GenGtheta'] = getTheta(gamGen)
-        # df_gammaGen.loc[:, 'GenGphi'] = getPhi(gamGen)
-
-        # gamGen2 = [df_gammaGen["GenGpx2"], df_gammaGen["GenGpy2"], df_gammaGen["GenGpz2"]]
-        # debug = df_gammaGen.loc[:, 'GenGp2'] == mag(gamGen2)
-        # df_gammaGen.loc[:, 'GenGtheta2'] = getTheta(gamGen2)
-        # df_gammaGen.loc[:, 'GenGphi2'] = getPhi(gamGen2)
-
-        df_z = pd.merge(df_electronGen, df_protonGen, how='inner', on='event')
-        df_z = pd.merge(df_z, df_gammaGen, how='inner', on='event')
-        self.df_z = df_z    #done with saving z
+            df_z = pd.merge(df_electronGen, df_protonGen, how='inner', on='event')
+            df_z = pd.merge(df_z, df_gammaGen, how='inner', on='event')
+            self.df_z = df_z    #done with saving z
 
         # data frames and their keys to read X part
         df_electronRec = pd.DataFrame()
@@ -325,8 +328,11 @@ class root2pickle():
         cut_recon = df_epgg.loc[:, "reconPi"] < 2  # recon gam angle
         cut_pi0upper = df_epgg.loc[:, "Mpi0"] < 0.2
         cut_pi0lower = df_epgg.loc[:, "Mpi0"] > 0.07
-        cut_sector = (df_epgg.loc[:, "Esector"]!=df_epgg.loc[:, "Gsector"]) & (df_epgg.loc[:, "Esector"]!=df_epgg.loc[:, "Gsector2"])
-
+        if "Esector" in df_epgg:
+            cut_sector = (df_epgg.loc[:, "Esector"]!=df_epgg.loc[:, "Gsector"]) & (df_epgg.loc[:, "Esector"]!=df_epgg.loc[:, "Gsector2"])
+        else:
+            cut_sector = 1
+            
         df_dvpi0 = df_epgg.loc[cut_xBupper & cut_xBlower & cut_Q2 & cut_W & cut_mmep & cut_meepgg &
                            cut_mpt & cut_recon & cut_pi0upper & cut_pi0lower & cut_sector, :]
 
@@ -467,17 +473,9 @@ class root2pickle():
         df_x = df_dvcs[~pi0to2gammas]
         self.df_x = df_x
 
-    def saveDfCartesian(self):
-        df_z = self.df_z
+    def saveDfCartesian(self, exp = False):
+
         df_x = self.df_x
-
-        df_z = df_z.rename(columns = {"GenEpx": "z1", "GenEpy": "z2", "GenEpz": "z3", "GenEe": "z0", "GenPpx": "z5", "GenPpy": "z6", "GenPpz": "z7", "GenPe": "z4", "GenGpx": "z9", "GenGpy": "z10", "GenGpz": "z11"})
-        # df_z.loc[:, "z03"] = 1 # electron
-        # df_z.loc[:, "z13"] = 2 # proton
-        df_z.loc[:, "z8"] = df_z.loc[:, "GenGp"] # photon
-        # df_z.loc[:, "z12"] = df_z.loc[:, "GenGp2"] # photon2
-        df_z = df_z.loc[:, ["event", "z0", "z1", "z2", "z3", "z4", "z5", "z6", "z7", "z8", "z9", "z10", "z11"]]#, "z12", "z13", "z14", "z15"]]
-
         df_x = df_x.rename(columns = {"Epx": "1", "Epy": "2", "Epz": "3", "Ee": "0","Ppx": "5", "Ppy": "6", "Ppz": "7", "Pe": "4", "Gpx": "9", "Gpy": "10", "Gpz": "11", "Ge": "8"})#, "Gpx2": "13", "Gpy2": "14", "Gpz2": "15", "Ge2": "12"})
         # df_x.loc[:, "3"] = 1 # electron
         # df_x.loc[:, "x13"] = 2 # proton
@@ -485,7 +483,19 @@ class root2pickle():
         # df_x.loc[:, "x33"] = 3 # photon2
         df_x = df_x.loc[:, ["event", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11"]]#, "12", "13", "14", "15", "Esector", "Gsector", "Gsector2"]]
 
-        df = pd.merge(df_x, df_z, how = 'inner', on='event')
+        if exp:
+            df = df_x
+        else:
+            df_z = self.df_z
+
+            df_z = df_z.rename(columns = {"GenEpx": "z1", "GenEpy": "z2", "GenEpz": "z3", "GenEe": "z0", "GenPpx": "z5", "GenPpy": "z6", "GenPpz": "z7", "GenPe": "z4", "GenGpx": "z9", "GenGpy": "z10", "GenGpz": "z11"})
+            # df_z.loc[:, "z03"] = 1 # electron
+            # df_z.loc[:, "z13"] = 2 # proton
+            df_z.loc[:, "z8"] = df_z.loc[:, "GenGp"] # photon
+            # df_z.loc[:, "z12"] = df_z.loc[:, "GenGp2"] # photon2
+            df_z = df_z.loc[:, ["event", "z0", "z1", "z2", "z3", "z4", "z5", "z6", "z7", "z8", "z9", "z10", "z11"]]#, "z12", "z13", "z14", "z15"]]
+
+            df = pd.merge(df_x, df_z, how = 'inner', on='event')
         self.df = df
 
 if __name__ == "__main__":
@@ -497,10 +507,11 @@ if __name__ == "__main__":
     parser.add_argument("-s","--entry_stop", help="entry_stop to stop reading the root file", default = None)
     # parser.add_argument("-m","--mode", help="dvcs cuts or all epg", default = "dvcs")
     parser.add_argument("-g","--generator", help="dvcs or pi0", default = "dvcs")
+    parser.add_argument("-e","--experimental", help="experimental data", default = False)
     
     args = parser.parse_args()
 
-    converter = root2pickle(args.fname, entry_stop = args.entry_stop, gen = args.generator)#, mode = args.mode)
+    converter = root2pickle(args.fname, entry_stop = args.entry_stop, gen = args.generator, exp = args.experimental)#, mode = args.mode)
     df = converter.df
 
     df.to_pickle(args.out)
