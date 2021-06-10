@@ -71,9 +71,9 @@ def getEnergy(vec1, mass):
 
 class root2pickle():
     #class to read root to make epg pairs, inherited from epg
-    def __init__(self, fname, entry_stop = None,):
+    def __init__(self, fname, entry_stop = None, gen = "dvcs"):
         self.fname = fname
-        self.readEPGG(entry_stop)
+        self.readEPGG(entry_stop, gen = gen)
         self.saveDVpi0vars()
         self.makeDVpi0()
         self.saveDVCSvars()
