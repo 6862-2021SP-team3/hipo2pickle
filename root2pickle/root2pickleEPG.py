@@ -457,8 +457,11 @@ class root2pickle():
         else:
             cut_sector = 1
 
+        cut_Ptheta = df_epgg.loc[:, "Ptheta"] < 24  # W
+
+
         df_dvcs = df_dvcs[cut_xBupper & cut_xBlower & cut_Q2 & cut_W & cut_Ee & cut_Ge & cut_Pp & cut_Vz & cut_mmepg & cut_mmep &
-                         cut_mmegupper & cut_mmeglower & cut_meepgupper & cut_meepglower & cut_mpt & cut_cone & cut_recon & cut_sector]
+                         cut_mmegupper & cut_mmeglower & cut_meepgupper & cut_meepglower & cut_mpt & cut_cone & cut_recon & cut_sector & cut_Ptheta]
 
         #dealing with duplicates
         df_dvcs = df_dvcs.sort_values(by='Ge', ascending = False)

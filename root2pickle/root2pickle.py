@@ -309,8 +309,11 @@ class root2pickle():
             cut_pi0lower = df_epgg.loc[:, "Mpi0"] > 0.07
             cut_sector = (df_epgg.loc[:, "Esector"]!=df_epgg.loc[:, "Gsector"]) & (df_epgg.loc[:, "Esector"]!=df_epgg.loc[:, "Gsector2"])
 
+            cut_Ptheta = df_epgg.loc[:, "Ptheta"] < 24  # W
+
+
             df_dvpi0 = df_epgg.loc[cut_xBupper & cut_xBlower & cut_Q2 & cut_W & cut_mmep & cut_meepgg &
-                               cut_mpt & cut_recon & cut_pi0upper & cut_pi0lower & cut_sector, :]
+                               cut_mpt & cut_recon & cut_pi0upper & cut_pi0lower & cut_sector & cut_Ptheta, :]
 
             #For an event, there can be two gg's passed conditions above.
             #Take only one gg's that makes pi0 invariant mass
@@ -346,6 +349,28 @@ class root2pickle():
         df_z = df_z.loc[:, ["event", "z0", "z1", "z2", "z3", "z4", "z5", "z6", "z7", "z8", "z9", "z10", "z11", "z12", "z13", "z14", "z15"]]
 
         df_x = df_x.rename(columns = {"Epx": "1", "Epy": "2", "Epz": "3", "Ee": "0","Ppx": "5", "Ppy": "6", "Ppz": "7", "Pe": "4", "Gpx": "9", "Gpy": "10", "Gpz": "11", "Ge": "8", "Gpx2": "13", "Gpy2": "14", "Gpz2": "15", "Ge2": "12"})
+        # df_x.loc[:, "3"] = 1 # electron
+        # df_x.loc[:, "x13"] = 2 # proton
+        # df_x.loc[:, "x23"] = 3 # photon
+        # df_x.loc[:, "x33"] = 3 # photon2
+        df_x = df_x.loc[:, ["event", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "Esector", "Gsector", "Gsector2"]]
+
+        df = pd.merge(df_x, df_z, how = 'inner', on='event')
+        self.df = df
+
+
+    def saveDfSpherical(self):
+        df_z = self.df_z
+        df_x = self.df_x
+
+        df_z = df_z.rename(columns = {"GenEp": "z1", "GenEtheta": "z2", "GenEpz": "z3", "GenEe": "z0", "GenPp": "z5", "GenPtheta": "z6", "GenPphi": "z7", "GenPe": "z4", "GenGp": "z9", "GenGtheta": "z10", "GenGphi": "z11", "GenGp2": "z13", "GenGtheta2": "z14", "GenGphi2": "z15"})
+        # df_z.loc[:, "z03"] = 1 # electron
+        # df_z.loc[:, "z13"] = 2 # proton
+        df_z.loc[:, "z8"] = df_z.loc[:, "GenGp"] # photon
+        df_z.loc[:, "z12"] = df_z.loc[:, "GenGp2"] # photon2
+        df_z = df_z.loc[:, ["event", "z0", "z1", "z2", "z3", "z4", "z5", "z6", "z7", "z8", "z9", "z10", "z11", "z12", "z13", "z14", "z15"]]
+
+        df_x = df_x.rename(columns = {"Ep": "1", "Etheta": "2", "Ephi": "3", "Ee": "0","Pp": "5", "Ptheta": "6", "Pphi": "7", "Pe": "4", "Gp": "9", "Gtheta": "10", "Gphi": "11", "Ge": "8", "Gp2": "13", "Gtheta2": "14", "Gphi2": "15", "Ge2": "12"})
         # df_x.loc[:, "3"] = 1 # electron
         # df_x.loc[:, "x13"] = 2 # proton
         # df_x.loc[:, "x23"] = 3 # photon
