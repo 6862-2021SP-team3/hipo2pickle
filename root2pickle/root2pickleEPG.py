@@ -79,7 +79,8 @@ class root2pickle():
         self.saveDVCSvars()
         self.makeDVCS()
         self.pi02gSubtraction()
-        self.saveDfCartesian(exp = exp)
+        # self.saveDfCartesian(exp = exp)
+        self.saveDfSpherical(exp = exp)
 
     def readFile(self):
         #read root using uproot
@@ -492,6 +493,31 @@ class root2pickle():
             df_z = self.df_z
 
             df_z = df_z.rename(columns = {"GenEpx": "z1", "GenEpy": "z2", "GenEpz": "z3", "GenEe": "z0", "GenPpx": "z5", "GenPpy": "z6", "GenPpz": "z7", "GenPe": "z4", "GenGpx": "z9", "GenGpy": "z10", "GenGpz": "z11"})
+            # df_z.loc[:, "z03"] = 1 # electron
+            # df_z.loc[:, "z13"] = 2 # proton
+            df_z.loc[:, "z8"] = df_z.loc[:, "GenGp"] # photon
+            # df_z.loc[:, "z12"] = df_z.loc[:, "GenGp2"] # photon2
+            df_z = df_z.loc[:, ["event", "z0", "z1", "z2", "z3", "z4", "z5", "z6", "z7", "z8", "z9", "z10", "z11"]]#, "z12", "z13", "z14", "z15"]]
+
+            df = pd.merge(df_x, df_z, how = 'inner', on='event')
+        self.df = df
+
+    def saveDfSpherical(self, exp = False):
+
+        df_x = self.df_x
+        df_x = df_x.rename(columns = {"Ep": "1", "Etheta": "2", "Ephi": "3", "Ee": "0","Pp": "5", "Ptheta": "6", "Pphi": "7", "Pe": "4", "Gp": "9", "Gtheta": "10", "Gphi": "11", "Ge": "8"})#, "Gp2": "13", "Gtheta2": "14", "Gphi2": "15", "Ge2": "12"})
+        # df_x.loc[:, "3"] = 1 # electron
+        # df_x.loc[:, "x13"] = 2 # proton
+        # df_x.loc[:, "x23"] = 3 # photon
+        # df_x.loc[:, "x33"] = 3 # photon2
+        df_x = df_x.loc[:, ["event", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11"]]#, "12", "13", "14", "15", "Esector", "Gsector", "Gsector2"]]
+
+        if exp:
+            df = df_x
+        else:
+            df_z = self.df_z
+
+            df_z = df_z.rename(columns = {"GenEp": "z1", "GenEtheta": "z2", "GenEphi": "z3", "GenEe": "z0", "GenPp": "z5", "GenPtheta": "z6", "GenPphi": "z7", "GenPe": "z4", "GenGp": "z9", "GenGtheta": "z10", "GenGphi": "z11"})
             # df_z.loc[:, "z03"] = 1 # electron
             # df_z.loc[:, "z13"] = 2 # proton
             df_z.loc[:, "z8"] = df_z.loc[:, "GenGp"] # photon
