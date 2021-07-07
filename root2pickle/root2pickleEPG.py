@@ -465,7 +465,7 @@ class root2pickle():
         else:
             cut_sector = 1
 
-        cut_Ptheta = df_dvcs.loc[:, "Ptheta"] < 24  # W
+        cut_Ptheta = df_dvcs.loc[:, "Ptheta"] > 45  # W
 
 
         df_dvcs = df_dvcs[cut_xBupper & cut_xBlower & cut_Q2 & cut_W & cut_Ee & cut_Ge & cut_Pp & cut_Vz & cut_mmepg & cut_mmep &
