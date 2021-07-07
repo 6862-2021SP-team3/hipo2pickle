@@ -227,7 +227,7 @@ class root2pickle():
         df_gammaRec.loc[:,'GIndex'] = df_gammaRec.index.get_level_values('subentry')
 
         #save only FD protons and photons
-        df_protonRec = df_protonRec[df_protonRec["Psector"]<7]
+        df_protonRec = df_protonRec[df_protonRec["Psector"]>7]
         df_gammaRec = df_gammaRec[df_gammaRec["Gsector"]<7]
 
         df_gg = pd.merge(df_gammaRec, df_gammaRec,
@@ -339,7 +339,7 @@ class root2pickle():
         else:
             cut_sector = 1
 
-        cut_Ptheta = df_epgg.loc[:, "Ptheta"] < 24  # W
+        cut_Ptheta = df_epgg.loc[:, "Ptheta"] > 45 # W
             
         df_dvpi0 = df_epgg.loc[cut_xBupper & cut_xBlower & cut_Q2 & cut_W & cut_mmep & cut_meepgg &
                            cut_mpt & cut_recon & cut_pi0upper & cut_pi0lower & cut_sector & cut_Ptheta, :]
@@ -457,7 +457,7 @@ class root2pickle():
         cut_meepgupper = df_dvcs["ME_epg"] < 1.5  # meepg
         cut_meepglower = df_dvcs["ME_epg"] > -0.5  # meepg
         cut_mpt = df_dvcs["MPt"] < 0.25  # mpt
-        cut_cone = df_dvcs["coneAngle"] > 5  # coneangle
+        cut_cone = df_dvcs["coneAngle"] > 15  # coneangle
         cut_recon = df_dvcs["reconGam"] < 2.5  # recon gam angle
         cut_coplanarity = df_dvcs["coplanarity"] < 25  # coplanarity angle
         if "Esector" in df_dvcs:
