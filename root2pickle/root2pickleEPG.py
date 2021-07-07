@@ -165,24 +165,29 @@ class root2pickle():
                 df_gammaGencopy.loc[:, "GenGpz2"] = np.where(df_gammaGen["GenGp"]>df_gammaGen["GenGp2"], df_gammaGen.loc[:, "GenGpz2"], df_gammaGen.loc[:, "GenGpz"])
                 df_gammaGen = df_gammaGencopy
 
+                gamGen2 = [df_gammaGen["GenGpx2"], df_gammaGen["GenGpy2"], df_gammaGen["GenGpz2"]]
+                debug = df_gammaGen.loc[:, 'GenGp2'] == mag(gamGen2)
+                df_gammaGen.loc[:, 'GenGtheta2'] = getTheta(gamGen2)
+                df_gammaGen.loc[:, 'GenGphi2'] = getPhi(gamGen2)
+
 
             # #spherical coordinates
             eleGen = [df_electronGen["GenEpx"], df_electronGen["GenEpy"], df_electronGen["GenEpz"]]
             df_electronGen.loc[:, 'GenEe'] = getEnergy(eleGen, me)
-            # df_electronGen.loc[:, 'GenEp'] = mag(eleGen)
-            # df_electronGen.loc[:, 'GenEtheta'] = getTheta(eleGen)
-            # df_electronGen.loc[:, 'GenEphi'] = getPhi(eleGen)
+            df_electronGen.loc[:, 'GenEp'] = mag(eleGen)
+            df_electronGen.loc[:, 'GenEtheta'] = getTheta(eleGen)
+            df_electronGen.loc[:, 'GenEphi'] = getPhi(eleGen)
 
             proGen = [df_protonGen["GenPpx"], df_protonGen["GenPpy"], df_protonGen["GenPpz"]]
             df_protonGen.loc[:, 'GenPe'] = getEnergy(proGen, M)
-            # df_protonGen.loc[:, 'GenPp'] = mag(proGen)
-            # df_protonGen.loc[:, 'GenPtheta'] = getTheta(proGen)
-            # df_protonGen.loc[:, 'GenPphi'] = getPhi(proGen)
+            df_protonGen.loc[:, 'GenPp'] = mag(proGen)
+            df_protonGen.loc[:, 'GenPtheta'] = getTheta(proGen)
+            df_protonGen.loc[:, 'GenPphi'] = getPhi(proGen)
 
             gamGen = [df_gammaGen["GenGpx"], df_gammaGen["GenGpy"], df_gammaGen["GenGpz"]]
             df_gammaGen.loc[:, 'GenGp'] = mag(gamGen)
-            # df_gammaGen.loc[:, 'GenGtheta'] = getTheta(gamGen)
-            # df_gammaGen.loc[:, 'GenGphi'] = getPhi(gamGen)
+            df_gammaGen.loc[:, 'GenGtheta'] = getTheta(gamGen)
+            df_gammaGen.loc[:, 'GenGphi'] = getPhi(gamGen)
 
             # gamGen2 = [df_gammaGen["GenGpx2"], df_gammaGen["GenGpy2"], df_gammaGen["GenGpz2"]]
             # debug = df_gammaGen.loc[:, 'GenGp2'] == mag(gamGen2)
