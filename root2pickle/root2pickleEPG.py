@@ -333,9 +333,11 @@ class root2pickle():
             cut_sector = (df_epgg.loc[:, "Esector"]!=df_epgg.loc[:, "Gsector"]) & (df_epgg.loc[:, "Esector"]!=df_epgg.loc[:, "Gsector2"])
         else:
             cut_sector = 1
+
+        cut_Ptheta = df_epgg.loc[:, "Ptheta"] < 24  # W
             
         df_dvpi0 = df_epgg.loc[cut_xBupper & cut_xBlower & cut_Q2 & cut_W & cut_mmep & cut_meepgg &
-                           cut_mpt & cut_recon & cut_pi0upper & cut_pi0lower & cut_sector, :]
+                           cut_mpt & cut_recon & cut_pi0upper & cut_pi0lower & cut_sector & cut_Ptheta, :]
 
         #For an event, there can be two gg's passed conditions above.
         #Take only one gg's that makes pi0 invariant mass
@@ -458,7 +460,7 @@ class root2pickle():
         else:
             cut_sector = 1
 
-        cut_Ptheta = df_epgg.loc[:, "Ptheta"] < 24  # W
+        cut_Ptheta = df_dvcs.loc[:, "Ptheta"] < 24  # W
 
 
         df_dvcs = df_dvcs[cut_xBupper & cut_xBlower & cut_Q2 & cut_W & cut_Ee & cut_Ge & cut_Pp & cut_Vz & cut_mmepg & cut_mmep &
