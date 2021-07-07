@@ -1,0 +1,18 @@
+import pandas as pd
+
+f1 = pd.read_pickle("2942.pkl")
+f2 = pd.read_pickle("2966.pkl")
+f3 = pd.read_pickle("2967.pkl")
+f4 = pd.read_pickle("3057.pkl")
+f5 = pd.read_pickle("3059.pkl")
+f6 = pd.read_pickle("3061.pkl")
+f7 = pd.read_pickle("3062.pkl")
+f8 = pd.read_pickle("3063.pkl")
+f9 = pd.read_pickle("3066.pkl")
+f10 = pd.read_pickle("3067.pkl")
+f11 = pd.read_pickle("3073.pkl")
+f12 = pd.read_pickle("3075.pkl")
+f13 = pd.read_pickle("3100.pkl")
+f14 = pd.read_pickle("3108.pkl")
+f = pd.concat([f1, f2, f3, f4, f5, f6, f7, f8, f9, f10, f11, f12, f13, f14])
+f.to_pickle("train.pkl")
