@@ -522,7 +522,7 @@ class root2pickle():
             df_z = df_z.rename(columns = {"GenEp": "z1", "GenEtheta": "z2", "GenEphi": "z3", "GenEe": "z0", "GenPp": "z5", "GenPtheta": "z6", "GenPphi": "z7", "GenPe": "z4", "GenGp": "z9", "GenGtheta": "z10", "GenGphi": "z11"})
             # df_z.loc[:, "z03"] = 1 # electron
             # df_z.loc[:, "z13"] = 2 # proton
-            df_z.loc[:, "z8"] = df_z.loc[:, "GenGp"] # photon
+            df_z.loc[:, "z8"] = df_z.loc[:, "z9"] # photon
             # df_z.loc[:, "z12"] = df_z.loc[:, "GenGp2"] # photon2
             df_z = df_z.loc[:, ["event", "z0", "z1", "z2", "z3", "z4", "z5", "z6", "z7", "z8", "z9", "z10", "z11"]]#, "z12", "z13", "z14", "z15"]]
 
